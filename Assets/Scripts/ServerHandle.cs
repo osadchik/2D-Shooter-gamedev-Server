@@ -26,7 +26,7 @@ namespace Assets.Scripts
             }
             Quaternion _rotation = packet.ReadQuaternion();
 
-            Server.clients[fromClient].player.SetInput(_inputs, _rotation);
+            Server.clients[fromClient].Player.SetInput(_inputs, _rotation);
         }
     }
 }

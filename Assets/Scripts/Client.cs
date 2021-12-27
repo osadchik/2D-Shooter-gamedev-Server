@@ -7,7 +7,7 @@ public class Client : MonoBehaviour
     public static int bufferSize = 4096;
 
     public int Id { get; set; }
-    public Player player { get; set; }
+    public Player Player { get; set; }
     public UdpClient Udp { get; set; }
 
     public Client(int clientId)
@@ -32,6 +32,7 @@ public class Client : MonoBehaviour
         public void Connect(IPEndPoint _endPoint)
         {
             endPoint = _endPoint;
+            ServerSend.Welcome(id, "Welcome to the server!");
         }
 
         /// <summary>Sends data to the client via UDP.</summary>
@@ -66,24 +67,24 @@ public class Client : MonoBehaviour
 
     public void SendIntoGame(string _playerName)
     {
-        player = NetworkManager.instance.InstantiatePlayer();
-        player.Initialize(Id, _playerName);
+        Player = NetworkManager.instance.InstantiatePlayer();
+        Player.Initialize(Id, _playerName);
 
         // Send all players to the new player
         foreach (Client _client in Server.clients.Values)
         {
-            if (_client.player != null && _client.Id != Id)
+            if (_client.Player != null && _client.Id != Id)
             {
-                ServerSend.SpawnPlayer(Id, _client.player);
+                ServerSend.SpawnPlayer(Id, _client.Player);
             }
         }
 
         // Send the new player to all players (including himself)
         foreach (Client _client in Server.clients.Values)
         {
-            if (_client.player != null)
+            if (_client.Player != null)
             {
-                ServerSend.SpawnPlayer(_client.Id, player);
+                ServerSend.SpawnPlayer(_client.Id, Player);
             }
         }
     }
@@ -93,8 +94,8 @@ public class Client : MonoBehaviour
     {
         Debug.Log($"{Udp.endPoint} has disconnected.");
 
-        UnityEngine.Object.Destroy(player.gameObject);
-        player = null;
+        UnityEngine.Object.Destroy(Player.gameObject);
+        Player = null;
 
         Udp.Disconnect();
     }

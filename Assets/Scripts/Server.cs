@@ -52,35 +52,38 @@ namespace Assets.Scripts
         {
             try
             {
-                IPEndPoint _clientEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                byte[] _data = udpListener.EndReceive(_result, ref _clientEndPoint);
+                IPEndPoint clientEndPoint = new IPEndPoint(IPAddress.Any, 0);
+                byte[] _data = udpListener.EndReceive(_result, ref clientEndPoint);
                 udpListener.BeginReceive(UDPReceiveCallback, null);
 
                 if (_data.Length < 4)
                 {
+                    Debug.Log("Incorrect package size!");
                     return;
                 }
 
                 using (Packet _packet = new Packet(_data))
                 {
-                    int _clientId = _packet.ReadInt();
+                    int clientId = _packet.ReadInt();
 
-                    if (_clientId == 0)
+                    if (clientId == 0)
                     {
-                        return;
+                        for (int i = 1; i <= MaxPlayers; i++)
+                        {
+                            if (clients[i].Udp.endPoint == null)
+                            {
+                                clients[i].Udp.Connect(clientEndPoint);
+                                return;
+                            }
+                        }
+
+                        Debug.Log($"{clientEndPoint} failed to connect: Server full!");
                     }
 
-                    if (clients[_clientId].Udp.endPoint == null)
-                    {
-                        // If this is a new connection
-                        clients[_clientId].Udp.Connect(_clientEndPoint);
-                        return;
-                    }
-
-                    if (clients[_clientId].Udp.endPoint.ToString() == _clientEndPoint.ToString())
+                    if (clients[clientId].Udp.endPoint.ToString() == clientEndPoint.ToString())
                     {
                         // Ensures that the client is not being impersonated by another by sending a false clientID
-                        clients[_clientId].Udp.HandleData(_packet);
+                        clients[clientId].Udp.HandleData(_packet);
                     }
                 }
             }
