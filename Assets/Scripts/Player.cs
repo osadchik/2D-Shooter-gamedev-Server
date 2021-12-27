@@ -20,25 +20,26 @@ namespace Assets.Scripts
 
         public void FixedUpdate()
         {
-            Vector2 _inputDirection = Vector2.zero;
+            Vector2 moveDirection = Vector2.zero;
+
             if (inputs[0])
             {
-                _inputDirection.y += 1;
+                moveDirection.y += 1;
             }
             if (inputs[1])
             {
-                _inputDirection.y -= 1;
+                moveDirection.y -= 1;
             }
             if (inputs[2])
             {
-                _inputDirection.x -= 1;
+                moveDirection.x -= 1;
             }
             if (inputs[3])
             {
-                _inputDirection.x += 1;
+                moveDirection.x += 1;
             }
 
-            Move(_inputDirection);
+            Move(moveDirection);
         }
 
         private void Move(Vector2 _inputDirection)
